@@ -1,15 +1,18 @@
 <?php
 
 namespace App\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use DateTime;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity()
  * @ORM\Table(name="classroom")
+ * @ORM\HasLifecycleCallbacks()
  */
-class Classroom {
+class Classroom
+{
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -31,11 +34,6 @@ class Classroom {
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function setId($id): void
-    {
-        $this->id = $id;
     }
 
     public function getName(): string
