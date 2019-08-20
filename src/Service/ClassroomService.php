@@ -42,13 +42,25 @@ class ClassroomService
         return $classroom;
     }
 
-    public function updateClassroom(int $classroomId, string $name): ?Classroom
+    public function updateClassroom(int $classroomId, ?string $name): ?Classroom
     {
         $classroom = $this->classroomRepository->findById($classroomId);
         if (!$classroom) {
             throw new EntityNotFoundException(self::CLASSROOM_NOT_FOUND.$classroomId);
         }
         $classroom->setName($name);
+        $this->classroomRepository->save($classroom);
+
+        return $classroom;
+    }
+
+    public function setClassroomStatus(int $classroomId, bool $active): ?Classroom
+    {
+        $classroom = $this->classroomRepository->findById($classroomId);
+        if (!$classroom) {
+            throw new EntityNotFoundException(self::CLASSROOM_NOT_FOUND.$classroomId);
+        }
+        $classroom->setActive($active);
         $this->classroomRepository->save($classroom);
 
         return $classroom;

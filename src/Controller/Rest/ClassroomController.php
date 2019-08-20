@@ -26,7 +26,7 @@ class ClassroomController extends AbstractFOSRestController
      *
      * @return View
      */
-    public function postClassroom(Request $request): View
+    public function addClassroom(Request $request): View
     {
         $classroom = $this->classroomService->addClassroom($request->get('name'));
 
@@ -69,11 +69,31 @@ class ClassroomController extends AbstractFOSRestController
      *
      * @throws \Doctrine\ORM\EntityNotFoundException
      */
-    public function putArticle(int $classroomId, Request $request): View
+    public function updateClassroom(int $classroomId, Request $request): View
     {
         $classroom = $this->classroomService->updateClassroom(
             $classroomId,
             $request->get('name')
+        );
+
+        return View::create($classroom, Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\Put("/classrooms/{classroomId}/activate")
+     *
+     * @param int $classroomId
+     * @param Request $request
+     *
+     * @return View
+     *
+     * @throws \Doctrine\ORM\EntityNotFoundException
+     */
+    public function activateClassroom(int $classroomId, Request $request): View
+    {
+        $classroom = $this->classroomService->setClassroomStatus(
+            $classroomId,
+            $request->get('active')
         );
 
         return View::create($classroom, Response::HTTP_OK);
@@ -89,7 +109,7 @@ class ClassroomController extends AbstractFOSRestController
      *
      * @throws \Doctrine\ORM\EntityNotFoundException
      */
-    public function deleteArticle(int $classroomId, Request $request): View
+    public function deleteClassroom(int $classroomId, Request $request): View
     {
         $this->classroomService->deleteClassroom($classroomId);
 

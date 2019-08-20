@@ -27,6 +27,12 @@ class Classroom
     private $name;
 
     /**
+     * @ORM\Column(type="boolean", options={"default":1})
+     * @Assert\NotBlank()
+     */
+    private $active = true;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
@@ -44,6 +50,11 @@ class Classroom
     public function setName($name): void
     {
         $this->name = $name;
+    }
+
+    public function setActive(bool $active): void
+    {
+        $this->active = $active;
     }
 
     public function getCreatedAt(): int
