@@ -78,4 +78,21 @@ class ClassroomController extends AbstractFOSRestController
 
         return View::create($classroom, Response::HTTP_OK);
     }
+
+    /**
+     * @Rest\Delete("/classrooms/{classroomId}")
+     *
+     * @param int $classroomId
+     * @param Request $request
+     *
+     * @return View
+     *
+     * @throws \Doctrine\ORM\EntityNotFoundException
+     */
+    public function deleteArticle(int $classroomId, Request $request): View
+    {
+        $this->classroomService->deleteClassroom($classroomId);
+
+        return View::create(null, Response::HTTP_NO_CONTENT);
+    }
 }

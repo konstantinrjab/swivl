@@ -8,6 +8,9 @@ use Doctrine\ORM\EntityNotFoundException;
 
 class ClassroomService
 {
+    private const CLASSROOM_NOT_FOUND = 'Classroom not found: ';
+
+    /** @var ClassroomRepository $classroomRepository */
     private $classroomRepository;
 
     public function __construct(ClassroomRepository $classroomRepository)
@@ -19,7 +22,7 @@ class ClassroomService
     {
         $classroom = $this->classroomRepository->findById($classroomId);
         if (!$classroom) {
-            throw new EntityNotFoundException('Classroom with id '.$classroomId.' not found');
+            throw new EntityNotFoundException(self::CLASSROOM_NOT_FOUND.$classroomId);
         }
 
         return $classroom;
@@ -43,7 +46,7 @@ class ClassroomService
     {
         $classroom = $this->classroomRepository->findById($classroomId);
         if (!$classroom) {
-            throw new EntityNotFoundException('Classroom with id '.$classroomId.' not found');
+            throw new EntityNotFoundException(self::CLASSROOM_NOT_FOUND.$classroomId);
         }
         $classroom->setName($name);
         $this->classroomRepository->save($classroom);
@@ -54,8 +57,10 @@ class ClassroomService
     public function deleteClassroom(int $classroomId): void
     {
         $classroom = $this->classroomRepository->findById($classroomId);
-        if ($classroom) {
-            $this->classroomRepository->delete($classroom);
+        if (!$classroom) {
+            throw new EntityNotFoundException(self::CLASSROOM_NOT_FOUND.$classroomId);
         }
+
+        $this->classroomRepository->delete($classroom);
     }
 }
