@@ -2,7 +2,10 @@
 
 namespace App\Controller\Rest;
 
-use App\Service\ClassroomService;
+use App\Entity\Classroom;
+use App\Repository\ClassroomRepository;
+use App\Service\ClassroomValidationService;
+use Doctrine\ORM\EntityNotFoundException;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,12 +14,21 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 
 class ClassroomController extends AbstractFOSRestController
 {
-    /** @var ClassroomService $classroomService */
-    private $classroomService;
+    private const CLASSROOM_NOT_FOUND = 'Classroom not found: ';
 
-    public function __construct(ClassroomService $classroomService)
+    /** @var ClassroomValidationService $validationService */
+    private $validationService;
+
+    /** @var ClassroomRepository $classroomRepository */
+    private $classroomRepository;
+
+    public function __construct(
+        ClassroomRepository $classroomRepository,
+        ClassroomValidationService $validationService
+    )
     {
-        $this->classroomService = $classroomService;
+        $this->validationService = $validationService;
+        $this->classroomRepository = $classroomRepository;
     }
 
     /**
@@ -28,7 +40,15 @@ class ClassroomController extends AbstractFOSRestController
      */
     public function addClassroom(Request $request): View
     {
-        $classroom = $this->classroomService->addClassroom($request->get('name'));
+        $violations = $this->validationService->onCreate($request);
+
+        if ($violations) {
+            return View::create($violations, Response::HTTP_BAD_REQUEST);
+        }
+
+        $classroom = new Classroom();
+        $classroom->setName($request->get('name'));
+        $this->classroomRepository->save($classroom);
 
         return View::create($classroom, Response::HTTP_CREATED);
     }
@@ -44,7 +64,7 @@ class ClassroomController extends AbstractFOSRestController
      */
     public function getClassroom(int $classroomId): View
     {
-        $classroom = $this->classroomService->getClassroom($classroomId);
+        $classroom = $this->getClassroomByIdOrDie($classroomId);
 
         return View::create($classroom, Response::HTTP_OK);
     }
@@ -54,7 +74,7 @@ class ClassroomController extends AbstractFOSRestController
      */
     public function getClassrooms(): View
     {
-        $classrooms = $this->classroomService->getAllClassrooms();
+        $classrooms = $this->classroomRepository->findAll();
 
         return View::create($classrooms, Response::HTTP_OK);
     }
@@ -71,10 +91,15 @@ class ClassroomController extends AbstractFOSRestController
      */
     public function updateClassroom(int $classroomId, Request $request): View
     {
-        $classroom = $this->classroomService->updateClassroom(
-            $classroomId,
-            $request->get('name')
-        );
+        $classroom = $this->getClassroomByIdOrDie($classroomId);
+        $violations = $this->validationService->onUpdate($request);
+
+        if ($violations) {
+            return View::create($violations, Response::HTTP_BAD_REQUEST);
+        }
+
+        $classroom->setName($request->get('name'));
+        $this->classroomRepository->save($classroom);
 
         return View::create($classroom, Response::HTTP_OK);
     }
@@ -91,10 +116,14 @@ class ClassroomController extends AbstractFOSRestController
      */
     public function activateClassroom(int $classroomId, Request $request): View
     {
-        $classroom = $this->classroomService->setClassroomStatus(
-            $classroomId,
-            $request->get('active')
-        );
+        $classroom = $this->getClassroomByIdOrDie($classroomId);
+        $violations = $this->validationService->onActivate($request);
+        if ($violations) {
+            return View::create($violations, Response::HTTP_BAD_REQUEST);
+        }
+
+        $classroom->setActive($request->query->getBoolean('active'));
+        $this->classroomRepository->save($classroom);
 
         return View::create($classroom, Response::HTTP_OK);
     }
@@ -111,8 +140,20 @@ class ClassroomController extends AbstractFOSRestController
      */
     public function deleteClassroom(int $classroomId, Request $request): View
     {
-        $this->classroomService->deleteClassroom($classroomId);
+        $classroom = $this->getClassroomByIdOrDie($classroomId);
+
+        $this->classroomRepository->delete($classroom);
 
         return View::create(null, Response::HTTP_NO_CONTENT);
+    }
+
+    private function getClassroomByIdOrDie(int $classroomId): Classroom
+    {
+        $classroom = $this->classroomRepository->findById($classroomId);
+        if (!$classroom) {
+            throw new EntityNotFoundException(self::CLASSROOM_NOT_FOUND.$classroomId);
+        }
+
+        return $classroom;
     }
 }
