@@ -23,30 +23,35 @@ insert into Phones (FirmID, Phone)
 values (1, '332-55-56'),
        (1, '332-50-01'),
        (2, '256-49-12');
-
-# TODO: make it work
-select Firms.Name, P.Phone
+# 1.a Вернуть название фирмы и ее телефон. В результате должны быть представлены
+#    все фирмы по одному разу. Если у фирмы нет телефона, нужно вернуть пробел или
+#    прочерк. Если у фирмы несколько телефонов, нужно вернуть любой из них.
+select Firms.Name, CASE WHEN P.Phone IS NULL THEN '--' ELSE P.Phone END as phone
 from Firms
          left join Phones P on Firms.ID = P.FirmID
-group by Firms.Name;
+group by Firms.Name, P.Phone;
 
-select Firms.Name
+# 1.b. Вернуть все фирмы, не имеющие телефонов.
+select Firms.*
 from Firms
          left join Phones P on Firms.ID = P.FirmID
 where P.Phone is null;
 
+# 1.c. Вернуть все фирмы, имеющие не менее 2-х телефонов.
 select Firms.Name, count(*) as count
 from Firms
          join Phones P on Firms.ID = P.FirmID
 group by Firms.Name
 having count >= 2;
 
+# 1.d. Вернуть все фирмы, имеющие менее 2-х телефонов.
 select Firms.Name, count(*) as count
 from Firms
          left join Phones P on Firms.ID = P.FirmID
 group by Firms.Name
 having count < 2;
 
+# 1.e. Вернуть фирму, имеющую максимальное кол-во телефонов.
 select Firms.Name, count(*) as count
 from Firms
          left join Phones P on Firms.ID = P.FirmID
