@@ -122,7 +122,7 @@ class ClassroomController extends AbstractFOSRestController
             return View::create($violations, Response::HTTP_BAD_REQUEST);
         }
 
-        $classroom->setActive($request->query->getBoolean('active'));
+        $classroom->setActive($request->request->getBoolean('active'));
         $this->classroomRepository->save($classroom);
 
         return View::create($classroom, Response::HTTP_OK);

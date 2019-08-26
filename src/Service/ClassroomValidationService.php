@@ -41,8 +41,7 @@ class ClassroomValidationService
 
     public function onActivate(Request $request): ?ConstraintViolationListInterface
     {
-        $active = $request->request->getBoolean('active');
-        $violations = $this->validator->validate($active, [
+        $violations = $this->validator->validate($request->get('active'), [
             new NotNull(),
         ]);
 
