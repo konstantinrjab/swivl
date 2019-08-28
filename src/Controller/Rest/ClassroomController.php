@@ -46,9 +46,7 @@ class ClassroomController extends AbstractFOSRestController
             return View::create($violations, Response::HTTP_BAD_REQUEST);
         }
 
-        $classroom = new Classroom();
-        $classroom->setName($request->get('name'));
-        $this->classroomRepository->save($classroom);
+        $classroom = $this->classroomRepository->add($request->get('name'));
 
         return View::create($classroom, Response::HTTP_CREATED);
     }
@@ -98,8 +96,7 @@ class ClassroomController extends AbstractFOSRestController
             return View::create($violations, Response::HTTP_BAD_REQUEST);
         }
 
-        $classroom->setName($request->get('name'));
-        $this->classroomRepository->save($classroom);
+        $this->classroomRepository->updateName($classroom, $request->get('name'));
 
         return View::create($classroom, Response::HTTP_OK);
     }
@@ -122,8 +119,7 @@ class ClassroomController extends AbstractFOSRestController
             return View::create($violations, Response::HTTP_BAD_REQUEST);
         }
 
-        $classroom->setActive($request->request->getBoolean('active'));
-        $this->classroomRepository->save($classroom);
+        $this->classroomRepository->activate($classroom, $request->request->getBoolean('active'));
 
         return View::create($classroom, Response::HTTP_OK);
     }

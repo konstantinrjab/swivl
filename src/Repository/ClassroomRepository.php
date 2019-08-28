@@ -25,17 +25,38 @@ class ClassroomRepository extends ServiceEntityRepository
         return $this->find($id);
     }
 
-    public function save(Classroom $classroom): void
+    public function add(string $name): Classroom
     {
-        $entityManager = $this->managerRegistry->getManager();
-        $entityManager->persist($classroom);
-        $entityManager->flush();
+        $classroom = new Classroom();
+        $classroom->setName($name);
+        $this->save($classroom);
+
+        return $classroom;
+    }
+
+    public function updateName(Classroom $classroom, string $name): void
+    {
+        $classroom->setName($name);
+        $this->save($classroom);
+    }
+
+    public function activate(Classroom $classroom, bool $active): void
+    {
+        $classroom->setActive($active);
+        $this->save($classroom);
     }
 
     public function delete(Classroom $classroom): void
     {
         $entityManager = $this->managerRegistry->getManager();
         $entityManager->remove($classroom);
+        $entityManager->flush();
+    }
+
+    private function save(Classroom $classroom): void
+    {
+        $entityManager = $this->managerRegistry->getManager();
+        $entityManager->persist($classroom);
         $entityManager->flush();
     }
 }
