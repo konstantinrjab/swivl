@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use DateTime;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\ClassroomRepository")
  * @ORM\Table(name="classroom")
  * @ORM\HasLifecycleCallbacks()
  */

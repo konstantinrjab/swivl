@@ -4,7 +4,8 @@ use part_two;
 CREATE TABLE Firms
 (
     ID   INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(30) NOT NULL
+    Name VARCHAR(30) NOT NULL,
+    INDEX (Name)
 );
 CREATE TABLE Phones
 (

@@ -1,7 +1,8 @@
 create table company
 (
     compid int auto_increment primary key,
-    name   nvarchar(100) not null
+    name   nvarchar(100) not null,
+    INDEX (name)
 );
 create table goods
 (
